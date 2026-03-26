@@ -20,6 +20,7 @@ pub struct Pawn;
 pub trait Piece {
     fn is_initial_position(&self, position: Position) -> bool;
     fn get_name(&self) -> &'static str;
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position>;
 }
 
 impl Piece for King {
@@ -33,6 +34,33 @@ impl Piece for King {
 
     fn get_name(&self) -> &'static str {
         "king"
+    }
+
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position> {
+        if place.chess_piece.is_none() {
+            return vec![];
+        }
+
+        let position = place.position;
+        let color = place.chess_piece.as_ref().unwrap().color;
+
+        vec![
+            (position.0 + 1, position.1 + 1),
+            (position.0 + 1, position.1),
+            (position.0, position.1 + 1),
+            (
+                position.0.checked_sub(1).unwrap_or(8),
+                position.1.checked_sub(1).unwrap_or(8),
+            ),
+            (position.0.checked_sub(1).unwrap_or(8), position.1),
+            (position.0, position.1.checked_sub(1).unwrap_or(8)),
+            (position.0 + 1, position.1.checked_sub(1).unwrap_or(8)),
+            (position.0.checked_sub(1).unwrap_or(8), position.1 + 1),
+        ]
+        .iter()
+        .filter(|p| p.0 <= 7 && p.1 <= 7 && !chessboard.has_piece(**p, color))
+        .map(|f| *f)
+        .collect::<Vec<Position>>()
     }
 }
 
@@ -48,6 +76,35 @@ impl Piece for Queen {
     fn get_name(&self) -> &'static str {
         "queen"
     }
+
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position> {
+        if place.chess_piece.is_none() {
+            return vec![];
+        }
+
+        let position = place.position;
+        let color = place.chess_piece.as_ref().unwrap().color;
+        let mut moves = vec![];
+
+        for i in 0..=7 {
+            moves.extend(
+                vec![
+                    (position.0 + i, position.1 + i),
+                    (position.0 + i, position.1),
+                    (position.0, position.1 + i),
+                    (position.0.checked_sub(i).unwrap_or(8), position.1),
+                    (position.0, position.1.checked_sub(i).unwrap_or(8)),
+                    (position.0 + i, position.1.checked_sub(i).unwrap_or(8)),
+                    (position.0.checked_sub(i).unwrap_or(8), position.1 + i),
+                ]
+                .iter()
+                .filter(|p| p.0 <= 7 && p.1 <= 7 && !chessboard.has_piece(**p, color))
+                .map(|f| *f),
+            );
+        }
+
+        moves
+    }
 }
 
 impl Piece for Bishop {
@@ -61,6 +118,10 @@ impl Piece for Bishop {
 
     fn get_name(&self) -> &'static str {
         "bishop"
+    }
+
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position> {
+        todo!()
     }
 }
 
@@ -76,6 +137,10 @@ impl Piece for Knight {
     fn get_name(&self) -> &'static str {
         "knight"
     }
+
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position> {
+        todo!()
+    }
 }
 
 impl Piece for Rook {
@@ -90,6 +155,10 @@ impl Piece for Rook {
     fn get_name(&self) -> &'static str {
         "rook"
     }
+
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position> {
+        todo!()
+    }
 }
 
 impl Piece for Pawn {
@@ -103,6 +172,10 @@ impl Piece for Pawn {
 
     fn get_name(&self) -> &'static str {
         "pawn"
+    }
+
+    fn generate_move(&self, place: &Place, chessboard: &Chessboard) -> Vec<Position> {
+        todo!()
     }
 }
 
